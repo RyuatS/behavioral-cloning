@@ -13,8 +13,11 @@ from flask import Flask
 from io import BytesIO
 
 from keras.models import load_model
+from models import Nvidia
 import h5py
 from keras import __version__ as keras_version
+import cv2
+
 
 sio = socketio.Server()
 app = Flask(__name__)
@@ -44,7 +47,7 @@ class SimplePIController:
 
 
 controller = SimplePIController(0.1, 0.002)
-set_speed = 9
+set_speed = 20
 controller.set_desired(set_speed)
 
 
@@ -62,6 +65,7 @@ def telemetry(sid, data):
         image = Image.open(BytesIO(base64.b64decode(imgString)))
         image_array = np.asarray(image)
         steering_angle = float(model.predict(image_array[None, :, :, :], batch_size=1))
+        
 
         throttle = controller.update(float(speed))
 
@@ -118,8 +122,12 @@ if __name__ == '__main__':
     if model_version != keras_version:
         print('You are using Keras version ', keras_version,
               ', but the model was built using ', model_version)
-
-    model = load_model(args.model)
+    
+#     fc1_node = 128
+#     fc2_node = 32
+#     model = TransferVGG(fc1_node, fc2_node)
+    model = Nvidia()
+    model.load(args.model)
 
     if args.image_folder != '':
         print("Creating image folder at {}".format(args.image_folder))
