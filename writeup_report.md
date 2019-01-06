@@ -78,6 +78,9 @@ My model consisted of the following layers(models.py lines 81 - 99):
 | Fully connected  | activation: RELU, out:10        |
 | Prediction angle | no activation, out:1            |
 
+Here is a visualization of the architecture. This architecture was released by the Nvidia team.
+
+<img src='./writeup_images/model_architecture.png'>
 
 
 #### 2. Attempts to reduce overfitting in the model
@@ -107,41 +110,48 @@ My first step was to transfer learning using the VGG16 architecture. I kept the 
 
 Next, I decided to make the model architecture which was released by the autonomous vehicles team at the Nvidia. This document is [Here](https://devblogs.nvidia.com/deep-learning-self-driving-cars/).
 At first, training was done using only the image of the center camera. However, when I ran it with the simulator, it went off the track. training was not done well. I thought that it was not possible to recognize the lane as a feature with only the center camera. So I trained the model using the images of the center, left and right cameras. I tried running it with a simulator and ran well in the center of the lane.
+
 The mean squared error of this model is shown below.
-<img src='./writeup_iamges/mean_squared_error.png'>
+
+<img src='./writeup_images/model_mean_squared_error.png' width=400>
 
 
-#### 2. Architecture Documentation
+
+#### 2. Creation of the Training Set & Training Process
+
+To capture good driving behavior, I first recorded three laps on track. And I recorded three laps by running the course in reverse. Therefore, I collected the six laps in total. Here is an example image of center lane driving:
+
+<img src='./writeup_images/example_course.jpg'  width=300/><br>
 
 
-Here is a visualization of the architecture (note: visualizing the architecture is optional according to the project rubric)
+I then recorded the vehicle recovering from the left side and right sides of the road back to center so that the vehicle would learn to how to recover to the center position. I show the recovery step images:
 
-![alt text][image1]
+<img src='./writeup_images/recovery1.jpg' width=250>
+<img src='./writeup_images/recovery2.jpg' width=250>
+<img src='./writeup_images/recovery3.jpg' width=250>
 
-#### 3. Creation of the Training Set & Training Process
+Then I repeated this process on track many times in order to get more data points.
 
-To capture good driving behavior, I first recorded two laps on track one using center lane driving. Here is an example image of center lane driving:
+To augment the data set, I also flipped images. And, I reverse angles. For example, here is an image that has then been flipped:
 
-![alt text][image2]
+<img src='./writeup_images/before_flip.jpg' />
+<img src='./writeup_images/after_flip.jpg' />
 
-I then recorded the vehicle recovering from the left side and right sides of the road back to center so that the vehicle would learn to .... These images show what a recovery looks like starting from ... :
+In order to learn the lane, I trimmed the top and bottom of the image. Here is an original image and trimmed image:
 
-![alt text][image3]
-![alt text][image4]
-![alt text][image5]
+<img src='./writeup_images/example_course.jpg' />
+<img src='./writeup_images/trim.jpg' />
 
-Then I repeated this process on track two in order to get more data points.
+Also, I used the three images of center, left and right cameras.
 
-To augment the data sat, I also flipped images and angles thinking that this would ... For example, here is an image that has then been flipped:
+After the collection process, I had 8662*6 number of data points.
 
-![alt text][image6]
-![alt text][image7]
+I finally randomly shuffled the data set and put 20% of the data into a validation set.
 
-Etc ....
-
-After the collection process, I had X number of data points. I then preprocessed this data by ...
+I used this training data for training the model. The validation set helped determine if the model was over or under fitting. The ideal number of epochs was 5 because it is nearing the local minimum with 1 epoch. So, I thought that it was okay not to have so many epochs. Also, thanks for six laps, the model learn a lot with one epoch, compared to one laps.
+I used an adam optimizer so that manually training the learning rate wasn't necessary.
 
 
-I finally randomly shuffled the data set and put Y% of the data into a validation set.
 
-I used this training data for training the model. The validation set helped determine if the model was over or under fitting. The ideal number of epochs was Z as evidenced by ... I used an adam optimizer so that manually training the learning rate wasn't necessary.
+### Test simulator
+[Here](./run1.mp4) is the video I ran with the simulator in my trained model. I succeeded in creating the model that does not go off.
